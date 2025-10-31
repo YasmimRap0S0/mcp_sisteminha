@@ -5,6 +5,11 @@ import axios from "axios";
 import { BuscarDesenvolvedoresProvider } from "../../components/buscar_desenvolvedores/BuscarDesenvolvedoresContexto";
 import NavHome from "../../components/NavHome/NavUsuario";
 
+const API_BASE_URL =
+  window.location.hostname === "localhost"
+    ? "http://localhost:8000/sisteminha_api"
+    : "http://34.198.150.133:8000/sisteminha_api";
+
 const AvaliarDesenvolvedor = () => {
   const [avaliacao, setAvaliacao] = useState(0);
   const [comentario, setComentario] = useState("");
@@ -16,28 +21,23 @@ const AvaliarDesenvolvedor = () => {
   const { desenvolvedorId } = useParams();
   const [usuarioId, setUsuarioId] = useState(null);
 
-  useEffect(()=>{
+  useEffect(() => {
     const token = localStorage.getItem("token");
-    if(token){     
+    if (token) {
       const user = JSON.parse(localStorage.getItem("user"));
-      if(user)
-        setUsuarioId(user.data.id);
-      else
-        navigate("/login-microempreendedor");
+      if (user) setUsuarioId(user.data.id);
+      else navigate("/login-microempreendedor");
     } else {
-        navigate("/login-microempreendedor");
+      navigate("/login-microempreendedor");
     }
-  }, [])
-
+  }, []);
 
   useEffect(() => {
     async function fetchDesenvolvedor() {
       if (!desenvolvedorId) return;
 
       try {
-        const response = await axios.get(
-          `http://127.0.0.1:8000/sisteminha_api/desenvolvedores/${desenvolvedorId}`
-        );
+        const response = await axios.get(`${API_BASE_URL}/desenvolvedores/${desenvolvedorId}`);
         setDesenvolvedor(response.data);
       } catch (err) {
         console.error("Erro ao buscar desenvolvedor:", err);
@@ -55,6 +55,11 @@ const AvaliarDesenvolvedor = () => {
       return;
     }
 
+      if (avaliacao === 0) {
+      setErro("Por favor, selecione uma quantidade de estrelas para avaliar.");
+      return;
+    }
+
     const data = {
       estrela: avaliacao,
       comentario,
@@ -63,17 +68,14 @@ const AvaliarDesenvolvedor = () => {
     };
 
     try {
-      const response = await fetch(
-        "http://127.0.0.1:8000/sisteminha_api/avaliacao_Desenvolvedores/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/avaliacao_Desenvolvedores/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
       if (!response.ok) {
         const errData = await response.json();
@@ -113,7 +115,7 @@ const AvaliarDesenvolvedor = () => {
                 />
                 <div>
                   <h2 className="text-xl font-semibold text-purple-900">
-                  {desenvolvedor.user_first_name} {desenvolvedor.user_last_name}
+                    {desenvolvedor.user_first_name} {desenvolvedor.user_last_name}
                   </h2>
                   <p className="text-gray-600">{desenvolvedor.descricao}</p>
                 </div>
@@ -122,18 +124,14 @@ const AvaliarDesenvolvedor = () => {
 
             <form onSubmit={handleSubmit}>
               <div className="mb-6 text-center">
-                <label className="block mb-2 font-bold text-gray-700">
-                  Avaliação:
-                </label>
+                <label className="block mb-2 font-bold text-gray-700">Avaliação:</label>
                 <div className="flex justify-center">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <FaStar
                       key={star}
                       size={60}
                       className={`cursor-pointer transition duration-200 mx-1 ${
-                        (hover || avaliacao) >= star
-                          ? "text-yellow-400"
-                          : "text-gray-400"
+                        (hover || avaliacao) >= star ? "text-yellow-400" : "text-gray-400"
                       }`}
                       onMouseEnter={() => setHover(star)}
                       onMouseLeave={() => setHover(0)}
@@ -144,9 +142,7 @@ const AvaliarDesenvolvedor = () => {
               </div>
 
               <div className="mb-6">
-                <label className="block mb-2 font-bold text-gray-700">
-                  Comentário:
-                </label>
+                <label className="block mb-2 font-bold text-gray-700">Comentário:</label>
                 <textarea
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Deixe um comentário..."
@@ -169,7 +165,6 @@ const AvaliarDesenvolvedor = () => {
         </div>
       </div>
 
-      {/* Popup de erro */}
       {erro && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="max-w-sm p-6 text-center bg-white rounded-lg shadow-lg">

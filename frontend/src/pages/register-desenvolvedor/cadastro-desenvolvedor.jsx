@@ -5,6 +5,11 @@ import imagem from '../../assets/img/programador 1.png';
 import Footer from '../../components/Footer/Footer';
 import { BuscarDesenvolvedoresProvider } from '../../components/buscar_desenvolvedores/BuscarDesenvolvedoresContexto';
 
+const API_BASE_URL = //modificando para requisição local ou ip externo
+  window.location.hostname === "localhost"
+    ? "http://127.0.0.1:8000/sisteminha_api"
+    : "http://34.198.150.133:8000/sisteminha_api";
+    
 function CadastroDesenvolvedor() {
   const navigate = useNavigate();
 
@@ -19,7 +24,7 @@ function CadastroDesenvolvedor() {
     event.preventDefault();
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/sisteminha_api/auth/registro/desenvolvedor/', {
+        const response = await fetch(`${API_BASE_URL}/auth/registro/desenvolvedor/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

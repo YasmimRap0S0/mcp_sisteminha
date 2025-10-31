@@ -11,7 +11,7 @@ import Load from "../../components/Load/Load";
 const API_BASE_URL =
   window.location.hostname === "localhost"
     ? "http://localhost:8000/sisteminha_api"
-    : "http://44.210.221.162:8000/sisteminha_api";
+    : "http://34.198.150.133:8000/sisteminha_api";
 
 function BuscarSistemas() {
   const location = useLocation();

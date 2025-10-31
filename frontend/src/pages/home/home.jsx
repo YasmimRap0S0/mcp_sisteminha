@@ -3,8 +3,6 @@ import ExibirCategoriasDosSistemas from "../exibir-categorias/ExibirCategoriasDo
 import NavHome from '../../components/NavHome/NavHome';
 import { useNavigate } from 'react-router-dom';
 import Banner from '../../components/banner/Banner';
-import Load from '../../components/Load/Load';
-
 
 function Home() {
   const navigate = useNavigate();
