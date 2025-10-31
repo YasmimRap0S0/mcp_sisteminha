@@ -1,0 +1,53 @@
+body {
+  background-color: white;
+}
+
+.ola-mariana {
+  color: #4294a2;
+  font-size: 20px;
+    font-weight: bold;
+}
+
+.veja-sistemas {
+  font-weight: bold;
+  font-size: 20px;
+  margin-left: 60px !important;
+
+}
+
+.card-buscar-setor {
+  background-color: #ededed;
+}
+
+.filtro-busca {
+  background-color: #4294a261;
+}
+
+.botao-sistema {
+  background-color: #7D5C9C  !important;
+  font-weight: bold !important;
+  border-radius: 9px !important;  
+}
+
+.botao-setor {
+  background-color: #7D5C9C !important;
+  color: #000000 !important;
+  width: 95% !important; /* Largura fixa para o botão */
+  border-radius: 25px !important;
+  padding: 3px 20px !important;   
+}
+
+.card-sistema-content {
+  background-color: #f4e9ff;
+  border-radius: 2vh;
+  border: 0;
+  margin-left: 50px !important;
+}
+
+.linha-roxa1 {
+  background-color:#7D5C9C  !important;
+  height: 4px;
+  margin-left: 0%;
+  margin-top: 0%;
+  margin-right: 87%;
+}
