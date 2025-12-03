@@ -1,6 +1,6 @@
 from mcp.server.fastmcp import FastMCP
 import httpx
-from mcp.types import PromptMessage, TextContent
+
 
 mcp = FastMCP("SisteminhaMCP")
 
@@ -54,14 +54,14 @@ def listar_sistemas() -> str:
         sistemas = response.json()
 
         if not sistemas:
-            return "Nenhum sistema cadastrado por aqui ainda 😅"
+            return "Nenhum sistema cadastrado"
 
         resultado = []
         for sistema in sistemas:
             nome = sistema.get("nome", "Sem nome")
-            status = sistema.get("status", "em_andamento")
-            setor = sistema.get("setor", "Não informado")
-            descricao = sistema.get("descricao", "Sem descrição")
+            status = sistema.get("status")
+            setor = sistema.get("setor")
+            descricao = sistema.get("descricao")
 
             dev = sistema.get("desenvolvedor")
             if isinstance(dev, dict):
@@ -80,28 +80,38 @@ def listar_sistemas() -> str:
                 f"{descricao}"
             )
 
-        return "Aqui estão os sistemas que estão rolando:\n\n" + "\n\n".join(resultado)
+        return "\n\n".join(resultado)
 
     except httpx.HTTPError as e:
-        return f"Erro ao conectar com a API 😬: {str(e)}"
+        return f"Erro ao conectar com a API: {str(e)}"
     except Exception as e:
         return f"Erro inesperado: {str(e)}"
 
 
 @mcp.prompt()
-def sisteminha_prompt():
-    return [
-        PromptMessage(
-            role="user",
-            content=TextContent(
-                type="text",
-                text="""Você é o assistente do Sisteminha. Não seja prolixo. Seja direto e responda com no máximo 5 linhas. Use emojis com moderação.
+def cumprimentar_usuario(nome: str, estilo: str = "amigável") -> str:
+    """Gerar um prompt de saudação"""
+    estilos = {
+        "amigável": "Por favor, escreva uma saudação calorosa e amigável em no máximo 5 linhas",
+        "formal": "Por favor, escreva uma saudação formal e profissional em no máximo 5 linhas",
+        "casual": "Por favor, escreva uma saudação casual e descontraídaem no máximo 5 linhas",
+    }
 
-Evite repetir o que o usuário já disse. Adapte o tom à informalidade do usuário quando necessário."""
-            )
-        )
-    ]
+    return f"{estilos.get(estilo, estilos['amigável'])} para alguém chamado {nome}."
+
+@mcp.prompt()
+def sugerir_dev_backend(requisitos: str = "") -> str:
+    """Sugerir um desenvolvedor backend baseado em requisitos"""
+    prompt_base = (
+        "Com base nos desenvolvedores cadastrados, sugira um desenvolvedor backend "
+        "de forma simples e amigável. Explique brevemente por que ele seria uma boa escolha."
+    )
+    
+    if requisitos:
+        return f"{prompt_base} Requisitos específicos: {requisitos}"
+    return prompt_base
+
 
 
 if __name__ == "__main__":
-    mcp.run(initial_messages=sisteminha_prompt())
+    mcp.run()
