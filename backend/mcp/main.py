@@ -1,19 +1,19 @@
-from mcp.server.fastmcp import FastMCP
-import httpx
-
+from mcp.server.fastmcp import FastMCP  # type: ignore
+import httpx  # type: ignore
 
 mcp = FastMCP("SisteminhaMCP")
-
-
-@mcp.tool()
-def somar(a: int, b: int) -> int:
-    return a + b
-
+client = httpx.Client(timeout=60.0)
 
 @mcp.tool()
 def listar_desenvolvedores() -> str:
+    """
+    Retorne de forma objetiva os dados solicitados
+    - Para listagens, utilize tabela ou lista, limitando cada dev a no máximo 2 linhas.
+    - Para consultas específicas, responda em até 4 linhas.
+    - Responda apenas ao que foi solicitado, de forma clara, amigável e com uso moderado de emojis.
+    """
     try:
-        response = httpx.get("http://localhost:8000/sisteminha_api/desenvolvedores/")
+        response = client.get("http://localhost:8000/sisteminha_api/desenvolvedores/")
         response.encoding = "utf-8"
         response.raise_for_status()
         devs = response.json()
@@ -47,8 +47,14 @@ def listar_desenvolvedores() -> str:
 
 @mcp.tool()
 def listar_sistemas() -> str:
+    """
+    Retorna informações dos sistemas de forma objetiva.
+    - Para listagens, use tabela ou lista, com até 3 linhas por sistema.
+    - Para consultas específicas, responda em no máximo 4 linhas.
+    - Responda apenas o que foi solicitado, de forma clara, amigável e com uso moderado de emojis.
+    """
     try:
-        response = httpx.get("http://localhost:8000/sisteminha_api/sistemas/")
+        response = client.get("http://localhost:8000/sisteminha_api/sistemas/")
         response.encoding = "utf-8"
         response.raise_for_status()
         sistemas = response.json()
@@ -62,7 +68,6 @@ def listar_sistemas() -> str:
             status = sistema.get("status")
             setor = sistema.get("setor")
             descricao = sistema.get("descricao")
-
             dev = sistema.get("desenvolvedor")
             if isinstance(dev, dict):
                 dev_nome = f"{dev.get('user_first_name', '')} {dev.get('user_last_name', '')}".strip()
@@ -74,14 +79,12 @@ def listar_sistemas() -> str:
                 github = "Sem GitHub"
 
             resultado.append(
-                f"💡 {nome} ({status})\n"
-                f"Dev: {dev_nome} ⭐ {estrelas}\n"
+                f"{nome} ({status})\n"
+                f"Dev: {dev_nome} {estrelas}\n"
                 f"Setor: {setor} | GitHub: {github}\n"
                 f"{descricao}"
             )
-
         return "\n\n".join(resultado)
-
     except httpx.HTTPError as e:
         return f"Erro ao conectar com a API: {str(e)}"
     except Exception as e:
@@ -89,29 +92,17 @@ def listar_sistemas() -> str:
 
 
 @mcp.prompt()
-def cumprimentar_usuario(nome: str, estilo: str = "amigável") -> str:
-    """Gerar um prompt de saudação"""
-    estilos = {
-        "amigável": "Por favor, escreva uma saudação calorosa e amigável em no máximo 5 linhas",
-        "formal": "Por favor, escreva uma saudação formal e profissional em no máximo 5 linhas",
-        "casual": "Por favor, escreva uma saudação casual e descontraídaem no máximo 5 linhas",
-    }
-
-    return f"{estilos.get(estilo, estilos['amigável'])} para alguém chamado {nome}."
-
-@mcp.prompt()
-def sugerir_dev_backend(requisitos: str = "") -> str:
-    """Sugerir um desenvolvedor backend baseado em requisitos"""
+def sugerir_devs(requisitos: str = "") -> str:
+    """Sugerir um desenvolvedor baseado nos requisitos"""
     prompt_base = (
-        "Com base nos desenvolvedores cadastrados, sugira um desenvolvedor backend "
-        "de forma simples e amigável. Explique brevemente por que ele seria uma boa escolha."
+        "Com base nos desenvolvedores cadastrados, sugira UM que se adeque aos requisitos do usuário. "
+        "Se os requisitos estiverem vazios, use como critério a avaliação média: recomende quem tiver nota ≥4, "
+        "priorizando o desenvolvedor com média 5. "
+        "Se mais de um atender aos requisitos, escolha aleatoriamente apenas um. "
+        "Se nenhum atender, recomende alguém mesmo assim. "
+        "A resposta deve ser simples e amigável, com uso moderado de emojis, e conter no máximo 6 linhas explicando por que ele seria uma boa escolha."
     )
-    
+
     if requisitos:
         return f"{prompt_base} Requisitos específicos: {requisitos}"
     return prompt_base
-
-
-
-if __name__ == "__main__":
-    mcp.run()

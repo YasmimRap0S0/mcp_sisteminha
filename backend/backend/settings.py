@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-hb7uh^%%zt=ftej6zpd%*ih+enzu(!#&#n8chj)!s4cd_75f^5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*', "127.0.0.1", "34.198.150.133",  "98.95.0.139"]
 
@@ -112,10 +112,10 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'sisteminha_mcp',
+        'NAME': 'sisteminha_mcp_2pk2',
         'USER': 'sisteminha_mcp_user',
-        'PASSWORD': 'HNN6up3NBxzi98xidopXrhfG7O5Qy7yl',
-        'HOST': 'dpg-d42aunruibrs73cr9d50-a.oregon-postgres.render.com',
+        'PASSWORD': '5itM6XJShl9nOEtzS40usI74s8ihF6Ov',
+        'HOST': 'dpg-d4nohruuk2gs73fp1sn0-a.oregon-postgres.render.com',
         'PORT': '5432',
     }
 }

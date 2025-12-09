@@ -27,11 +27,12 @@ export function LoginMicroempreendedor() {
               ))}
             </ul>
             <button 
-              onClick={() => setMessages([])} 
-              className="px-4 py-2 mt-4 text-white transition bg-red-500 rounded-lg hover:bg-red-600"
-            >
-              Fechar
+                onClick={() => setMessages([])} 
+                className="px-4 py-2 mt-4 text-white transition bg-red-500 rounded-lg hover:bg-red-600"
+              >
+                Fechar
             </button>
+
           </div>
         </div>
       )}

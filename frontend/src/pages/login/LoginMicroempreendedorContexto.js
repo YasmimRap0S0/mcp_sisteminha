@@ -14,7 +14,7 @@ export const LoginMicroempreendedorProvider = ({ children }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [messages, setMessages] = useState([]);
-  const urlBase = API_BASE_URL; 
+  const urlBase = API_BASE_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,7 +42,15 @@ export const LoginMicroempreendedorProvider = ({ children }) => {
 
   return (
     <LoginMicroempreendedorContexto.Provider
-      value={{ email, setEmail, password, setPassword, messages, handleSubmit }}
+      value={{
+        email,
+        setEmail,
+        password,
+        setPassword,
+        messages,
+        setMessages,
+        handleSubmit,
+      }}
     >
       {children}
     </LoginMicroempreendedorContexto.Provider>
