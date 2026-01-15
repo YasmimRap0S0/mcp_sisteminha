@@ -7,10 +7,33 @@ client = httpx.Client(timeout=60.0)
 @mcp.tool()
 def listar_desenvolvedores() -> str:
     """
-    Retorne de forma objetiva os dados solicitados
-    - Para listagens, utilize tabela ou lista, limitando cada dev a no máximo 2 linhas.
-    - Para consultas específicas, responda em até 4 linhas.
-    - Responda apenas ao que foi solicitado, de forma clara, amigável e com uso moderado de emojis.
+    Lista todos os desenvolvedores cadastrados no sistema.
+    
+    Dados disponíveis para cada desenvolvedor:
+    - Nome completo (user_first_name + user_last_name)
+    - Descrição
+    - GitHub (username)
+    - Avaliação média (0-5 estrelas)
+    - Setores de atuação (lista de setores dos sistemas desenvolvidos)
+    - Número de avaliações recebidas
+    
+    INSTRUÇÕES PARA A LLM:
+    1. Analise EXATAMENTE o que o usuário solicitou na interface do Claude Desktop.
+    2. Retorne APENAS as informações solicitadas. NÃO adicione informações extras.
+    3. Se o usuário pedir "lista todos" ou "mostre os desenvolvedores":
+       - Use formato de tabela ou lista compacta
+       - Limite a 2 linhas por desenvolvedor
+       - Inclua apenas: Nome, GitHub, Avaliação média, Setores principais
+    4. Se o usuário pedir informações específicas (ex: "quem tem mais estrelas", "desenvolvedores de Python"):
+       - Filtre e retorne apenas os que atendem ao critério
+       - Responda em no máximo 4 linhas por desenvolvedor
+       - Destaque o critério solicitado
+    5. Se o usuário pedir detalhes de um desenvolvedor específico:
+       - Retorne apenas os dados desse desenvolvedor
+       - Use no máximo 6 linhas
+    6. Seja direto, claro e objetivo. Use emojis com moderação (máximo 1-2 por resposta).
+    7. NÃO faça sugestões ou recomendações a menos que explicitamente solicitado.
+    8. Se não houver desenvolvedores, informe de forma breve e objetiva.
     """
     try:
         response = client.get("http://localhost:8000/sisteminha_api/desenvolvedores/")
@@ -48,10 +71,35 @@ def listar_desenvolvedores() -> str:
 @mcp.tool()
 def listar_sistemas() -> str:
     """
-    Retorna informações dos sistemas de forma objetiva.
-    - Para listagens, use tabela ou lista, com até 3 linhas por sistema.
-    - Para consultas específicas, responda em no máximo 4 linhas.
-    - Responda apenas o que foi solicitado, de forma clara, amigável e com uso moderado de emojis.
+    Lista todos os sistemas cadastrados no sistema.
+    
+    Dados disponíveis para cada sistema:
+    - Nome do sistema
+    - Status (concluído ou em andamento)
+    - Setor de atuação
+    - Descrição
+    - Desenvolvedor responsável (nome completo, avaliação média, GitHub)
+    - Avaliação média do sistema (0-5 estrelas)
+    - Número de avaliações recebidas
+    - Categoria
+    
+    INSTRUÇÕES PARA A LLM:
+    1. Analise EXATAMENTE o que o usuário solicitou na interface do Claude Desktop.
+    2. Retorne APENAS as informações solicitadas. NÃO adicione informações extras.
+    3. Se o usuário pedir "lista todos" ou "mostre os sistemas":
+       - Use formato de tabela ou lista compacta
+       - Limite a 3 linhas por sistema
+       - Inclua apenas: Nome, Status, Setor, Desenvolvedor, Avaliação média
+    4. Se o usuário pedir informações específicas (ex: "sistemas concluídos", "sistemas de saúde"):
+       - Filtre e retorne apenas os que atendem ao critério
+       - Responda em no máximo 4 linhas por sistema
+       - Destaque o critério solicitado
+    5. Se o usuário pedir detalhes de um sistema específico:
+       - Retorne apenas os dados desse sistema
+       - Use no máximo 6 linhas
+    6. Seja direto, claro e objetivo. Use emojis com moderação (máximo 1-2 por resposta).
+    7. NÃO faça sugestões ou recomendações a menos que explicitamente solicitado.
+    8. Se não houver sistemas, informe de forma breve e objetiva.
     """
     try:
         response = client.get("http://localhost:8000/sisteminha_api/sistemas/")
@@ -95,14 +143,19 @@ def listar_sistemas() -> str:
 def sugerir_devs(requisitos: str = "") -> str:
     """Sugerir um desenvolvedor baseado nos requisitos"""
     prompt_base = (
-        "Com base nos desenvolvedores cadastrados, sugira UM que se adeque aos requisitos do usuário. "
-        "Se os requisitos estiverem vazios, use como critério a avaliação média: recomende quem tiver nota ≥4, "
-        "priorizando o desenvolvedor com média 5. "
-        "Se mais de um atender aos requisitos, escolha aleatoriamente apenas um. "
-        "Se nenhum atender, recomende alguém mesmo assim. "
-        "A resposta deve ser simples e amigável, com uso moderado de emojis, e conter no máximo 6 linhas explicando por que ele seria uma boa escolha."
+        "Analise os desenvolvedores cadastrados e sugira EXATAMENTE UM que melhor se adeque aos requisitos. "
+        "Critérios de seleção: "
+        "- Se requisitos específicos foram fornecidos, busque desenvolvedores que atendam (setor, tecnologias, experiência mencionada). "
+        "- Se mais de um atender, escolha o que tiver maior avaliação média. "
+        "- Se nenhum atender perfeitamente, escolha o mais próximo possível. "
+        "- Se nenhum requisito foi fornecido, priorize desenvolvedores com avaliação média ≥4, dando preferência àqueles com média 5. "
+        "- Se houver empate, escolha aleatoriamente. "
+        "Formato da resposta: máximo 6 linhas, objetiva e amigável, com uso moderado de emojis (máximo 2). "
+        "Inclua: nome do desenvolvedor, por que foi escolhido, principais setores, avaliação média e GitHub. "
+        "NÃO adicione informações extras ou sugestões adicionais."
     )
 
     if requisitos:
-        return f"{prompt_base} Requisitos específicos: {requisitos}"
+        return f"{prompt_base} Requisitos específicos do usuário: {requisitos}"
     return prompt_base
+

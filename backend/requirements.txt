@@ -17,3 +17,5 @@ uritemplate==4.1.1
 djangorestframework-simplejwt==5.5.1
 PyJWT==2.10.1
 
+fastmcp==2.13.0.2
+httpx==0.28.1

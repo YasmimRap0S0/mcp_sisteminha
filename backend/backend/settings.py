@@ -23,7 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-hb7uh^%%zt=ftej6zpd%*ih+enzu(!#&#n8chj)!s4cd_75f^5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+# Temporarily enable DEBUG for local development so static files (Swagger UI)
+# are served by `runserver`. Remember to set this to False in production.
+DEBUG = True
 
 ALLOWED_HOSTS = ['*', "127.0.0.1", "34.198.150.133",  "98.95.0.139"]
 
@@ -76,13 +78,13 @@ CORS_ALLOWED_ORIGINS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    # CORS middleware should come high in the chain (before CommonMiddleware)
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -112,10 +114,10 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'sisteminha_mcp_2pk2',
-        'USER': 'sisteminha_mcp_user',
-        'PASSWORD': '5itM6XJShl9nOEtzS40usI74s8ihF6Ov',
-        'HOST': 'dpg-d4nohruuk2gs73fp1sn0-a.oregon-postgres.render.com',
+        'NAME': 'sisteminha_mcp_a865',
+        'USER': 'sisteminha_mcp_a865_user',
+        'PASSWORD': 'Ohn8WgTX36E58jjoSS89eCewRIQgzw8n',
+        'HOST': 'dpg-d5k5d7koud1c73ebkjqg-a.oregon-postgres.render.com',
         'PORT': '5432',
     }
 }
