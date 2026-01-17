@@ -2,7 +2,6 @@ from mcp.server.fastmcp import FastMCP  # type: ignore
 import httpx  # type: ignore
 
 mcp = FastMCP("SisteminhaMCP")
-client = httpx.Client(timeout=60.0)
 
 
 @mcp.tool()
@@ -10,34 +9,18 @@ def listar_desenvolvedores():
     """
     Lista todos os desenvolvedores cadastrados no sistema.
 
-    INSTRUÇÕES OBRIGATÓRIAS PARA A LLM:
-
-    REGRA GERAL:
+    INSTRUÇÕES PARA A LLM:
     - Responda apenas o que foi perguntado, sem contexto extra.
-    - Quando a pergunta for "listar" ou equivalente, cite SOMENTE os nomes dos desenvolvedores, separados por vírgulas.
-
-    1. INTERPRETAÇÃO:
-    - "listar todos" / "mostrar desenvolvedores" → cite apenas os nomes dos desenvolvedores, em uma única frase.
-    - Pergunta com filtro ("quem tem X", "desenvolvedores de Y") → apenas os que atendem, também citados apenas pelo nome do desenvolvedor.
-    - "detalhes de [nome]" → apenas esse dev, até 2 frases com informações básicas.
-    - Perguntas customizadas → adapte ao contexto, mas sempre direto.
-
-    2. FORMATAÇÃO:
-    - Texto simples e direto.
-    - Sem listas, tabelas ou formatação especial.
-
-    3. PROIBIÇÕES:
-    - Não inventar informações.
-    - Não usar frases de cortesia.
-    - Não dar contexto extra.
-    - Não usar listas ou tabelas.
-
-    4. CASOS ESPECIAIS:
+    - "listar todos" / "mostrar desenvolvedores" → cite somente os nomes, separados por vírgulas.
+    - Pergunta com filtro ("quem tem X", "desenvolvedores de Y") → cite apenas os nomes que atendem.
+    - "detalhes de [nome]" → apenas esse desenvolvedor, até 2 frases com informações básicas.
+    - Texto simples e direto, sem listas, tabelas ou emojis (exceto se solicitado).
+    - Não inventar informações, não usar frases de cortesia, não dar contexto extra.
     - Se não houver desenvolvedores: "Nenhum desenvolvedor cadastrado."
-    - Se a pergunta for ambígua: escolha a interpretação mais simples.
     """
+
     try:
-        response = client.get("http://localhost:8000/sisteminha_api/desenvolvedores/")
+        response = httpx.get("http://localhost:8000/sisteminha_api/desenvolvedores/")
         response.encoding = "utf-8"
         response.raise_for_status()
         devs = response.json()
@@ -74,35 +57,18 @@ def listar_sistemas():
     """
     Lista todos os sistemas cadastrados no sistema.
 
-    INSTRUÇÕES OBRIGATÓRIAS PARA A LLM:
-
-    REGRA GERAL:
+    INSTRUÇÕES PARA A LLM:
     - Responda apenas o que foi perguntado, sem contexto extra.
-    - Quando a pergunta for "liste" ou equivalente, cite SOMENTE os nomes dos sistemas, separados por vírgulas.
-
-    1. INTERPRETAÇÃO:
-    - "listar todos" / "mostrar sistemas" → apenas nomes, em uma única frase.
-    - Pergunta com filtro ("sistemas concluídos", "sistemas de X") → apenas os que atendem, também citados apenas pelo nome do sistema.
+    - "listar todos" / "mostrar sistemas" → cite somente os nomes, separados por vírgulas.
+    - Pergunta com filtro ("sistemas concluídos", "sistemas de X") → cite apenas os nomes que atendem.
     - "detalhes de [nome]" → apenas esse sistema, até 2 frases com informações básicas.
-    - Perguntas customizadas → adapte ao contexto, mas sempre direto.
-
-    2. FORMATAÇÃO:
-    - Texto simples e direto.
-    - Sem listas, tabelas ou formatação especial.
-    - Emojis: não usar, exceto se solicitado.
-
-    3. PROIBIÇÕES:
-    - Não inventar informações.
-    - Não usar frases de cortesia.
-    - Não dar contexto extra.
-    - Não usar listas ou tabelas.
-
-    4. CASOS ESPECIAIS:
+    - Texto simples e direto, sem listas, tabelas ou emojis (exceto se solicitado).
+    - Não inventar informações, não usar frases de cortesia, não dar contexto extra.
     - Se não houver sistemas: "Nenhum sistema cadastrado."
-    - Se a pergunta for ambígua: escolha a interpretação mais simples.
     """
+
     try:
-        response = client.get("http://localhost:8000/sisteminha_api/sistemas/")
+        response = httpx.get("http://localhost:8000/sisteminha_api/sistemas/")
         response.encoding = "utf-8"
         response.raise_for_status()
         sistemas = response.json()
