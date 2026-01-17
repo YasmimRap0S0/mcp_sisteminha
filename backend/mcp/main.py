@@ -4,36 +4,37 @@ import httpx  # type: ignore
 mcp = FastMCP("SisteminhaMCP")
 client = httpx.Client(timeout=60.0)
 
+
 @mcp.tool()
-def listar_desenvolvedores() -> str:
+def listar_desenvolvedores():
     """
     Lista todos os desenvolvedores cadastrados no sistema.
-    
-    Dados disponíveis para cada desenvolvedor:
-    - Nome completo (user_first_name + user_last_name)
-    - Descrição
-    - GitHub (username)
-    - Avaliação média (0-5 estrelas)
-    - Setores de atuação (lista de setores dos sistemas desenvolvidos)
-    - Número de avaliações recebidas
-    
-    INSTRUÇÕES PARA A LLM:
-    1. Analise EXATAMENTE o que o usuário solicitou na interface do Claude Desktop.
-    2. Retorne APENAS as informações solicitadas. NÃO adicione informações extras.
-    3. Se o usuário pedir "lista todos" ou "mostre os desenvolvedores":
-       - Use formato de tabela ou lista compacta
-       - Limite a 2 linhas por desenvolvedor
-       - Inclua apenas: Nome, GitHub, Avaliação média, Setores principais
-    4. Se o usuário pedir informações específicas (ex: "quem tem mais estrelas", "desenvolvedores de Python"):
-       - Filtre e retorne apenas os que atendem ao critério
-       - Responda em no máximo 4 linhas por desenvolvedor
-       - Destaque o critério solicitado
-    5. Se o usuário pedir detalhes de um desenvolvedor específico:
-       - Retorne apenas os dados desse desenvolvedor
-       - Use no máximo 6 linhas
-    6. Seja direto, claro e objetivo. Use emojis com moderação (máximo 1-2 por resposta).
-    7. NÃO faça sugestões ou recomendações a menos que explicitamente solicitado.
-    8. Se não houver desenvolvedores, informe de forma breve e objetiva.
+
+    INSTRUÇÕES OBRIGATÓRIAS PARA A LLM:
+
+    REGRA GERAL:
+    - Responda apenas o que foi perguntado, sem contexto extra.
+    - Quando a pergunta for "listar" ou equivalente, cite SOMENTE os nomes dos desenvolvedores, separados por vírgulas.
+
+    1. INTERPRETAÇÃO:
+    - "listar todos" / "mostrar desenvolvedores" → cite apenas os nomes dos desenvolvedores, em uma única frase.
+    - Pergunta com filtro ("quem tem X", "desenvolvedores de Y") → apenas os que atendem, também citados apenas pelo nome do desenvolvedor.
+    - "detalhes de [nome]" → apenas esse dev, até 2 frases com informações básicas.
+    - Perguntas customizadas → adapte ao contexto, mas sempre direto.
+
+    2. FORMATAÇÃO:
+    - Texto simples e direto.
+    - Sem listas, tabelas ou formatação especial.
+
+    3. PROIBIÇÕES:
+    - Não inventar informações.
+    - Não usar frases de cortesia.
+    - Não dar contexto extra.
+    - Não usar listas ou tabelas.
+
+    4. CASOS ESPECIAIS:
+    - Se não houver desenvolvedores: "Nenhum desenvolvedor cadastrado."
+    - Se a pergunta for ambígua: escolha a interpretação mais simples.
     """
     try:
         response = client.get("http://localhost:8000/sisteminha_api/desenvolvedores/")
@@ -42,7 +43,7 @@ def listar_desenvolvedores() -> str:
         devs = response.json()
 
         if not devs:
-            return "Nenhum desenvolvedor cadastrado no momento."
+            return {"mensagem": "Nenhum desenvolvedor cadastrado no momento."}
 
         resultado = []
         for dev in devs:
@@ -52,54 +53,53 @@ def listar_desenvolvedores() -> str:
             estrelas = dev.get("avaliacao_media", 0)
             setores = ", ".join(dev.get("setores", [])) or "Nenhum"
 
-            resultado.append(
-                f"{nome}\n"
-                f"{descricao}\n"
-                f"GitHub: {github}\n"
-                f"Setores: {setores}\n"
-                f"Média: {estrelas}"
-            )
+            resultado.append({
+                "nome": nome,
+                "descricao": descricao,
+                "github": github,
+                "setores": setores,
+                "avaliacao_media": estrelas
+            })
 
-        return "\n\n".join(resultado)
+        return resultado  # devolve lista de dicts crua
 
     except httpx.HTTPError as e:
-        return f"Erro ao conectar com a API: {str(e)}"
+        return {"erro": f"Erro ao conectar com a API: {str(e)}"}
     except Exception as e:
-        return f"Erro inesperado: {str(e)}"
+        return {"erro": f"Erro inesperado: {str(e)}"}
 
 
 @mcp.tool()
-def listar_sistemas() -> str:
+def listar_sistemas():
     """
     Lista todos os sistemas cadastrados no sistema.
-    
-    Dados disponíveis para cada sistema:
-    - Nome do sistema
-    - Status (concluído ou em andamento)
-    - Setor de atuação
-    - Descrição
-    - Desenvolvedor responsável (nome completo, avaliação média, GitHub)
-    - Avaliação média do sistema (0-5 estrelas)
-    - Número de avaliações recebidas
-    - Categoria
-    
-    INSTRUÇÕES PARA A LLM:
-    1. Analise EXATAMENTE o que o usuário solicitou na interface do Claude Desktop.
-    2. Retorne APENAS as informações solicitadas. NÃO adicione informações extras.
-    3. Se o usuário pedir "lista todos" ou "mostre os sistemas":
-       - Use formato de tabela ou lista compacta
-       - Limite a 3 linhas por sistema
-       - Inclua apenas: Nome, Status, Setor, Desenvolvedor, Avaliação média
-    4. Se o usuário pedir informações específicas (ex: "sistemas concluídos", "sistemas de saúde"):
-       - Filtre e retorne apenas os que atendem ao critério
-       - Responda em no máximo 4 linhas por sistema
-       - Destaque o critério solicitado
-    5. Se o usuário pedir detalhes de um sistema específico:
-       - Retorne apenas os dados desse sistema
-       - Use no máximo 6 linhas
-    6. Seja direto, claro e objetivo. Use emojis com moderação (máximo 1-2 por resposta).
-    7. NÃO faça sugestões ou recomendações a menos que explicitamente solicitado.
-    8. Se não houver sistemas, informe de forma breve e objetiva.
+
+    INSTRUÇÕES OBRIGATÓRIAS PARA A LLM:
+
+    REGRA GERAL:
+    - Responda apenas o que foi perguntado, sem contexto extra.
+    - Quando a pergunta for "liste" ou equivalente, cite SOMENTE os nomes dos sistemas, separados por vírgulas.
+
+    1. INTERPRETAÇÃO:
+    - "listar todos" / "mostrar sistemas" → apenas nomes, em uma única frase.
+    - Pergunta com filtro ("sistemas concluídos", "sistemas de X") → apenas os que atendem, também citados apenas pelo nome do sistema.
+    - "detalhes de [nome]" → apenas esse sistema, até 2 frases com informações básicas.
+    - Perguntas customizadas → adapte ao contexto, mas sempre direto.
+
+    2. FORMATAÇÃO:
+    - Texto simples e direto.
+    - Sem listas, tabelas ou formatação especial.
+    - Emojis: não usar, exceto se solicitado.
+
+    3. PROIBIÇÕES:
+    - Não inventar informações.
+    - Não usar frases de cortesia.
+    - Não dar contexto extra.
+    - Não usar listas ou tabelas.
+
+    4. CASOS ESPECIAIS:
+    - Se não houver sistemas: "Nenhum sistema cadastrado."
+    - Se a pergunta for ambígua: escolha a interpretação mais simples.
     """
     try:
         response = client.get("http://localhost:8000/sisteminha_api/sistemas/")
@@ -108,35 +108,37 @@ def listar_sistemas() -> str:
         sistemas = response.json()
 
         if not sistemas:
-            return "Nenhum sistema cadastrado"
+            return {"mensagem": "Nenhum sistema cadastrado"}
 
         resultado = []
         for sistema in sistemas:
             nome = sistema.get("nome", "Sem nome")
             status = sistema.get("status")
             setor = sistema.get("setor")
+            media_avaliacao_sistema = sistema.get("avaliacao_media", 0)
+            num_avaliacoes = sistema.get("num_avaliacoes", 0)
             descricao = sistema.get("descricao")
             dev = sistema.get("desenvolvedor")
+
             if isinstance(dev, dict):
                 dev_nome = f"{dev.get('user_first_name', '')} {dev.get('user_last_name', '')}".strip()
-                estrelas = dev.get("avaliacao_media", 0)
                 github = dev.get("github", "Sem GitHub")
             else:
                 dev_nome = "Desenvolvedor não informado"
-                estrelas = 0
                 github = "Sem GitHub"
 
-            resultado.append(
-                f"{nome} ({status})\n"
-                f"Dev: {dev_nome} {estrelas}\n"
-                f"Setor: {setor} | GitHub: {github}\n"
-                f"{descricao}"
-            )
-        return "\n\n".join(resultado)
+            resultado.append({
+                "nome": nome, "status": status, "setor": setor, "avaliacao_media": media_avaliacao_sistema,
+                "num_avaliacoes": num_avaliacoes,"descricao": descricao, "dev_nome": dev_nome,
+                "github": github
+            })
+
+        return resultado 
+
     except httpx.HTTPError as e:
-        return f"Erro ao conectar com a API: {str(e)}"
+        return {"erro": f"Erro ao conectar com a API: {str(e)}"}
     except Exception as e:
-        return f"Erro inesperado: {str(e)}"
+        return {"erro": f"Erro inesperado: {str(e)}"}
 
 
 @mcp.prompt()
@@ -159,3 +161,6 @@ def sugerir_devs(requisitos: str = "") -> str:
         return f"{prompt_base} Requisitos específicos do usuário: {requisitos}"
     return prompt_base
 
+
+if __name__ == "__main__":
+    mcp.run()

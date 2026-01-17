@@ -13,7 +13,6 @@ import uuid
 
 User = get_user_model()
 
-
 def criar_imagem(nome_arquivo, color=(200, 200, 200)):
     img = Image.new('RGB', (200, 200), color=color)
     img_io = BytesIO()
@@ -60,7 +59,7 @@ class Command(BaseCommand):
                 defaults={'imagem': criar_imagem('categoria_vendas_online.png')}
             )
 
-            # Dados de exemplo (versão enxuta)
+            # Desenvolvedores com descrições claras
             desenvolvedores_data = [
                 {
                     'username': 'carlos_silva',
@@ -69,7 +68,7 @@ class Command(BaseCommand):
                     'last_name': 'Silva',
                     'cpf': '11111111111',
                     'github': 'carlosdev',
-                    'descricao': 'Desenvolvedor especializado em Python e sistemas de gestão para prestadores de serviços. Experiência em Django e Flask.',
+                    'descricao': 'Desenvolvedor fullstack especializado em Python, Django e Flask para sistemas de gestão. Trabalho com Mobile também',
                     'setores': ['Serviços'],
                     'avaliacoes': [5, 5, 5, 5, 5],
                 },
@@ -80,7 +79,7 @@ class Command(BaseCommand):
                     'last_name': 'Santos',
                     'cpf': '22222222222',
                     'github': 'anadev',
-                    'descricao': 'Especialista em desenvolvimento de sistemas para restaurantes, delivery e food trucks. Trabalha com React e JavaScript.',
+                    'descricao': 'Frontend especialista em React e JavaScript, com foco em sistemas de alimentação e delivery.',
                     'setores': ['Alimentação'],
                     'avaliacoes': [5, 5, 5, 5],
                 },
@@ -91,9 +90,9 @@ class Command(BaseCommand):
                     'last_name': 'Raposo',
                     'cpf': '33333333333',
                     'github': 'YasmimRap0S0',
-                    'descricao': 'Desenvolvedora focada em e-commerce e plataformas de vendas online. Experiência em Python e desenvolvimento web.',
-                    'setores': ['Vendas'],
-                    'avaliacoes': [5, 5, 4, 4, 5],
+                    'descricao': 'Desenvolvedora backend para e-commerce e plataformas de vendas online, com experiência em Python e web.',
+                    'setores': ['Serviços'],
+                    'avaliacoes': [4, 4, 4, 4],
                 },
                 {
                     'username': 'maria_costa',
@@ -102,9 +101,9 @@ class Command(BaseCommand):
                     'last_name': 'Costa',
                     'cpf': '44444444444',
                     'github': 'mariadev',
-                    'descricao': 'Desenvolvedora frontend especializada em React e JavaScript. Cria sistemas para salões, estúdios e clínicas de beleza.',
-                    'setores': ['Beleza e Estética', 'Vendas'],
-                    'avaliacoes': [4, 4, 4, 4],
+                    'descricao': 'Frontend especializada em React e JavaScript, criando sistemas para salões e clínicas de beleza.',
+                    'setores': ['Beleza e Estética'],
+                    'avaliacoes': [3, 3, 3, 3],
                 },
                 {
                     'username': 'pedro_almeida',
@@ -113,9 +112,20 @@ class Command(BaseCommand):
                     'last_name': 'Almeida',
                     'cpf': '55555555555',
                     'github': 'pedrodev',
-                    'descricao': 'Especialista em sistemas de gestão para prestadores de serviços diversos. Trabalha com Python e desenvolvimento backend.',
+                    'descricao': 'Backend com foco em Python, Clojure e Go, aplicando arquiteturas modernas de microserviços.',
                     'setores': ['Serviços'],
-                    'avaliacoes': [4, 4, 4, 5],
+                    'avaliacoes': [],
+                },
+                {
+                    'username': 'joao_pereira',
+                    'email': 'joao.pereira@email.com',
+                    'first_name': 'João',
+                    'last_name': 'Pereira',
+                    'cpf': '66666666666',
+                    'github': 'joaodbadmin',
+                    'descricao': 'Backend especializado em administração de sistemas e banco de dados.',
+                    'setores': ['Serviços'],
+                    'avaliacoes': [],
                 },
             ]
 
@@ -139,7 +149,7 @@ class Command(BaseCommand):
 
             desenvolvedores = []
 
-            # Criar desenvolvedores e objetos relacionados (prevenindo colisões por email)
+            # Criar desenvolvedores e objetos relacionados
             self.stdout.write('Criando desenvolvedores...')
             for dev_data in desenvolvedores_data:
                 email = dev_data.get('email', '')
@@ -148,7 +158,7 @@ class Command(BaseCommand):
                     user = User.objects.filter(email=email).first()
                 if not user:
                     uname = safe_username(dev_data.get('username') or email)
-                    user, created = User.objects.get_or_create(
+                    user, _ = User.objects.get_or_create(
                         username=uname,
                         defaults={
                             'email': email,
@@ -163,7 +173,7 @@ class Command(BaseCommand):
                 user.set_password('senha123')
                 user.save()
 
-                dev, created = Desenvolvedor.objects.get_or_create(
+                dev, _ = Desenvolvedor.objects.get_or_create(
                     cpf=dev_data['cpf'],
                     defaults={
                         'user': user,
@@ -171,19 +181,6 @@ class Command(BaseCommand):
                         'descricao': dev_data.get('descricao', ''),
                     }
                 )
-                if not created:
-                    updated = False
-                    if dev.user != user:
-                        dev.user = user
-                        updated = True
-                    if dev.github != dev_data.get('github', ''):
-                        dev.github = dev_data.get('github', '')
-                        updated = True
-                    if dev.descricao != dev_data.get('descricao', ''):
-                        dev.descricao = dev_data.get('descricao', '')
-                        updated = True
-                    if updated:
-                        dev.save()
 
                 if not dev.foto or not getattr(dev.foto, 'name', None):
                     img_name = f"dev_{dev.cpf}_avatar.png"
@@ -206,34 +203,87 @@ class Command(BaseCommand):
                     )
                     avaliador_idx += 1
 
-            # Criar alguns sistemas de exemplo
+            # Mapear devs por nome para facilitar vínculo nos sistemas
+            dev_by_name = {d.user.first_name + ' ' + d.user.last_name: d for d, _ in desenvolvedores}
+
+            # Criar sistemas claros e coerentes
             self.stdout.write('Criando sistemas de exemplo...')
             sistemas_data = [
                 {
-                    'nome': 'Sistema de Gestão para Prestadores de Serviços',
-                    'setor': 'Serviços',
-                    'descricao': 'Sistema completo para gestão de agendamentos, clientes e pagamentos para prestadores de serviços',
-                    'categoria': categorias['servicos'],
-                    'desenvolvedor': desenvolvedores[0][0],
+                    'nome': 'BeautyHair',
+                    'setor': 'Beleza e Estética',
+                    'descricao': 'Plataforma para gestão de salões de beleza e agendamento de clientes.',
+                    'categoria': categorias['beleza_estetica'],
+                    'desenvolvedor': dev_by_name.get('Maria Costa'),
+                    'status': 'concluido',
+                    'avaliacoes': [5, 4, 4, 5],
+                },
+                {
+                    'nome': 'iLanches',
+                    'setor': 'Alimentação',
+                    'descricao': 'Sistema para gestão de lanchonetes e food trucks, com pedidos online e cardápio digital.',
+                    'categoria': categorias['alimentacao'],
+                    'desenvolvedor': dev_by_name.get('Ana Santos'),
                     'status': 'concluido',
                     'avaliacoes': [5, 5, 5, 5],
                 },
                 {
-                    'nome': 'Sistema de Gestão de Restaurante',
+                    'nome': 'GestorFood',
                     'setor': 'Alimentação',
-                    'descricao': 'Sistema completo para gestão de restaurantes, cardápios e pedidos',
+                    'descricao': 'Gestão de restaurantes e pizzarias: mesas, pedidos e pagamentos.',
                     'categoria': categorias['alimentacao'],
-                    'desenvolvedor': desenvolvedores[1][0],
+                    'desenvolvedor': dev_by_name.get('Ana Santos'),
                     'status': 'concluido',
-                    'avaliacoes': [5, 5, 5, 4],
+                    'avaliacoes': [4, 4, 4, 4],
+                },
+                {
+                    'nome': 'ServiPlus',
+                    'setor': 'Serviços',
+                    'descricao': 'Gestão para prestadores de serviços: agenda, clientes e pagamentos.',
+                    'categoria': categorias['servicos'],
+                    'desenvolvedor': dev_by_name.get('Carlos Silva'),
+                    'status': 'concluido',
+                    'avaliacoes': [3, 3, 3, 3],
+                },
+                {
+                    'nome': 'Sisteminha',
+                    'setor': 'Serviços',
+                    'descricao': 'Sistema simples para microempreendedores gerenciarem seus serviços e clientes.',
+                    'categoria': categorias['servicos'],
+                    'desenvolvedor': dev_by_name.get('Yasmim Raposo'),
+                    'status': 'concluido',
+                    'avaliacoes': [5, 5, 5, 5],
+                },
+                {
+                    'nome': 'GestorPro',
+                    'setor': 'Serviços',
+                    'descricao': 'Sistema de gestão empresarial com foco em relatórios e controle financeiro.',
+                    'categoria': categorias['servicos'],
+                    'desenvolvedor': dev_by_name.get('Pedro Almeida'),
+                    'status': 'em andamento',
+                    'avaliacoes': [],
+                },
+                {
+                    'nome': 'DBManager',
+                    'setor': 'Serviços',
+                    'descricao': 'Ferramenta para administração de bancos de dados e monitoramento de sistemas.',
+                    'categoria': categorias['servicos'],
+                    'desenvolvedor': dev_by_name.get('João Pereira'),
+                    'status': 'concluido',
+                    'avaliacoes': [5, 4, 5],
                 },
             ]
 
             sistemas = []
             for sdata in sistemas_data:
+                dev_ref = sdata['desenvolvedor']
+                if not dev_ref:
+                    self.stdout.write(self.style.WARNING(f"Desenvolvedor não encontrado para sistema: {sdata['nome']}"))
+                    continue
+
                 sistema, created = Sistema.objects.get_or_create(
                     nome=sdata['nome'],
-                    desenvolvedor=sdata['desenvolvedor'],
+                    desenvolvedor=dev_ref,
                     defaults={
                         'setor': sdata.get('setor', ''),
                         'descricao': sdata.get('descricao', ''),
@@ -261,11 +311,14 @@ class Command(BaseCommand):
             self.stdout.write('Criando avaliações de sistemas...')
             avaliador_idx = 0
             for sistema, sdata in sistemas:
+                # Deletar avaliações existentes para garantir consistência
+                Avaliacao_Sistema.objects.filter(sistema=sistema).delete()
                 for nota in sdata.get('avaliacoes', []):
-                    Avaliacao_Sistema.objects.get_or_create(
+                    Avaliacao_Sistema.objects.create(
                         sistema=sistema,
                         usuario=usuarios_avaliadores[avaliador_idx % len(usuarios_avaliadores)],
-                        defaults={'estrela': nota, 'comentario': f'Avaliação {nota} estrelas para {sistema.nome}'}
+                        estrela=nota,
+                        comentario=f'Avaliação {nota} estrelas para {sistema.nome}'
                     )
                     avaliador_idx += 1
 
