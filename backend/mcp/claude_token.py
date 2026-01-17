@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
 """
-Calcula tokens médios por interação (usuário + assistente) em um chat JSON.
+Calcula tokens médios por interação (usuário + LLM) em um chat JSON.
 
 Uso:
   python claude_token.py chat.json --preco-entrada 0.0030 --preco-saida 0.150
 
 Formato do chat.json:
 [
-  {"role": "user", "content": "Pergunta..."},
-  {"role": "assistant", "content": "Resposta..."},
-  {"role": "user", "content": "Outra pergunta..."},
-  {"role": "assistant", "content": "Outra resposta..."}
+  {"role": "usuario", "content": "Pergunta..."},
+  {"role": "LLM", "content": "Resposta..."},
+
 ]
 """
 
@@ -46,7 +45,7 @@ def main():
     tokens_entrada_total = 0
     tokens_saida_total = 0
 
-    # percorre em pares (usuário + assistente)
+    # percorre em pares (usuário + LLM)
     for i in range(0, len(mensagens), 2):
         entrada = mensagens[i]["content"]
         saida = mensagens[i+1]["content"] if i+1 < len(mensagens) else ""

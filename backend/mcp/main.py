@@ -8,7 +8,6 @@ mcp = FastMCP("SisteminhaMCP")
 def listar_desenvolvedores():
     """
     Lista todos os desenvolvedores cadastrados no sistema.
-
     INSTRUÇÕES PARA A LLM:
     - Responda apenas o que foi perguntado, sem contexto extra.
     - "listar todos" / "mostrar desenvolvedores" → cite somente os nomes, separados por vírgulas.
@@ -18,13 +17,11 @@ def listar_desenvolvedores():
     - Não inventar informações, não usar frases de cortesia, não dar contexto extra.
     - Se não houver desenvolvedores: "Nenhum desenvolvedor cadastrado."
     """
-
     try:
         response = httpx.get("http://localhost:8000/sisteminha_api/desenvolvedores/")
         response.encoding = "utf-8"
         response.raise_for_status()
         devs = response.json()
-
         if not devs:
             return {"mensagem": "Nenhum desenvolvedor cadastrado no momento."}
 
@@ -43,20 +40,16 @@ def listar_desenvolvedores():
                 "setores": setores,
                 "avaliacao_media": estrelas
             })
-
-        return resultado  # devolve lista de dicts crua
-
+        return resultado
     except httpx.HTTPError as e:
         return {"erro": f"Erro ao conectar com a API: {str(e)}"}
     except Exception as e:
         return {"erro": f"Erro inesperado: {str(e)}"}
 
-
 @mcp.tool()
 def listar_sistemas():
     """
     Lista todos os sistemas cadastrados no sistema.
-
     INSTRUÇÕES PARA A LLM:
     - Responda apenas o que foi perguntado, sem contexto extra.
     - "listar todos" / "mostrar sistemas" → cite somente os nomes, separados por vírgulas.
@@ -66,16 +59,13 @@ def listar_sistemas():
     - Não inventar informações, não usar frases de cortesia, não dar contexto extra.
     - Se não houver sistemas: "Nenhum sistema cadastrado."
     """
-
     try:
         response = httpx.get("http://localhost:8000/sisteminha_api/sistemas/")
         response.encoding = "utf-8"
         response.raise_for_status()
         sistemas = response.json()
-
         if not sistemas:
             return {"mensagem": "Nenhum sistema cadastrado"}
-
         resultado = []
         for sistema in sistemas:
             nome = sistema.get("nome", "Sem nome")
@@ -85,7 +75,6 @@ def listar_sistemas():
             num_avaliacoes = sistema.get("num_avaliacoes", 0)
             descricao = sistema.get("descricao")
             dev = sistema.get("desenvolvedor")
-
             if isinstance(dev, dict):
                 dev_nome = f"{dev.get('user_first_name', '')} {dev.get('user_last_name', '')}".strip()
                 github = dev.get("github", "Sem GitHub")
@@ -98,9 +87,7 @@ def listar_sistemas():
                 "num_avaliacoes": num_avaliacoes,"descricao": descricao, "dev_nome": dev_nome,
                 "github": github
             })
-
         return resultado 
-
     except httpx.HTTPError as e:
         return {"erro": f"Erro ao conectar com a API: {str(e)}"}
     except Exception as e:
