@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { FaStar } from "react-icons/fa";
 import { useParams, useNavigate } from "react-router-dom";
-import NavUsuario from "../../components/NavHome/NavBasicUser";
 import axios from "axios";
 import { BuscarDesenvolvedoresProvider } from "../../components/buscar_desenvolvedores/BuscarDesenvolvedoresContexto";
 import NavHome from "../../components/NavHome/NavUsuario";
+
+const API_BASE_URL =
+  window.location.hostname === "localhost"
+    ? "http://localhost:8000/sisteminha_api"
+    : "http://34.198.150.133:8000/sisteminha_api";
+
 
 const AvaliarSistema = () => {
   const [avaliacao, setAvaliacao] = useState(0);
@@ -29,15 +34,13 @@ const AvaliarSistema = () => {
     } else {
         navigate("/login-microempreendedor");
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     async function fetchSistema() {
       if (!sistemaId) return;
       try {
-        const response = await axios.get(
-          `http://127.0.0.1:8000/sisteminha_api/sistemas/${sistemaId}`
-        );
+        const response = await axios.get(`${API_BASE_URL}/sistemas/${sistemaId}`);
         setSistema(response.data);
       } catch (err) {
         console.error("Erro ao buscar sistema:", err);
@@ -64,17 +67,14 @@ const AvaliarSistema = () => {
     };
 
     try {
-      const response = await fetch(
-        "http://127.0.0.1:8000/sisteminha_api/avaliacao_Sistemas/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/avaliacao_Sistemas/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
       if (!response.ok) {
         const errData = await response.json();

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os
 from pathlib import Path
+from decouple import config #type: ignore
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,9 +24,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-hb7uh^%%zt=ftej6zpd%*ih+enzu(!#&#n8chj)!s4cd_75f^5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# Temporarily enable DEBUG for local development so static files (Swagger UI)
+# are served by `runserver`. Remember to set this to False in production.
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*', "127.0.0.1", "34.198.150.133",  "98.95.0.139"]
 
 
 # Application definition
@@ -63,24 +66,26 @@ REST_FRAMEWORK = {
 AUTH_USER_MODEL= 'sisteminha.User'
 
 CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000'
+    'http://localhost:3000',
+    'http://98.95.0.139:3000',
 ]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  
-    "http://127.0.0.1:3000",  
+    "http://127.0.0.1:3000",
+    "http://98.95.0.139:3000",
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    # CORS middleware should come high in the chain (before CommonMiddleware)
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -110,11 +115,11 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'sisteminha_mcp',
-        'USER': 'sisteminha_mcp_user',
-        'PASSWORD': 'HNN6up3NBxzi98xidopXrhfG7O5Qy7yl',
-        'HOST': 'dpg-d42aunruibrs73cr9d50-a.oregon-postgres.render.com',
-        'PORT': '5432',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT'),
     }
 }
 

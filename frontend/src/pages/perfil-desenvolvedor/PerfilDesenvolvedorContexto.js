@@ -6,7 +6,7 @@ export const PerfilDesenvolvedorContexto = createContext();
 const API_BASE_URL =
   window.location.hostname === "localhost"
     ? "http://localhost:8000/sisteminha_api"
-    : "http://3.212.24.16:8000/sisteminha_api";
+    : "http://34.198.150.133:8000/sisteminha_api";
 
 export const PerfilDesenvolvedorProvider = ({ children }) => {
     const [perfil, setPerfil] = useState(null);

@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
-import { LoginDesenvolvedorContexto, LoginDesenvolvedorProvider } from "./LoginDesenvolvedorContexto";
+import { LoginDesenvolvedorContexto } from "./LoginDesenvolvedorContexto";
 import NavBar from "../../components/NavHome/NavHome";
 import Footer from "../../components/Footer/Footer";
 import imagem from "../../assets/img/fotologin.png";
@@ -77,7 +77,7 @@ export function LoginDesenvolvedor() {
                     required
                   />
                   <p className="mt-2 text-sm text-indigo-500 cursor-pointer hover:underline">Esqueci minha senha</p>
-                  <button type="submit" className="mb-2 flex items-center justify-center w-full py-4 mt-5 font-semibold text-gray-100 bg-indigo-500 rounded-lg hover:bg-indigo-700 focus:outline-none">
+                  <button type="submit" className="flex items-center justify-center w-full py-4 mt-5 mb-2 font-semibold text-gray-100 bg-indigo-500 rounded-lg hover:bg-indigo-700 focus:outline-none">
                     <span className="ml-3">Entrar</span>
                   </button>
                 </form>

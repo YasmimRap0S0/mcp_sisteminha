@@ -20,12 +20,12 @@ import starYellow from "../../assests/star-yellow.png";
 const API_BASE_URL =
   window.location.hostname === "localhost"
     ? "http://localhost:8000/sisteminha_api"
-    : "http://44.210.221.162:8000/sisteminha_api";
+    : "http://34.198.150.133:8000/sisteminha_api";
 
 const API_BASE_URL_IMAGEM =
   window.location.hostname === "localhost"
     ? "http://localhost:8000"
-    : "http://44.210.221.162:8000";
+    : "http://34.198.150.133:8000";
 
 function PerfilDesenvolvedor() {
     const { desenvolvedorId } = useParams();
@@ -142,7 +142,7 @@ function PerfilDesenvolvedor() {
                                         <img key={index} src={starGray} alt="Estrela" className="w-[20px]" />
                                     ))}
                                 </div>
-                                <p className="ml-3 font-sans text-[20px] font-medium">({perfil.avaliacao_media+".0"} - {perfil.num_avaliacoes} {perfil.num_avaliacoes == 1 ? 'avaliação' : 'avaliações'})</p>
+                                <p className="ml-3 font-sans text-[20px] font-medium">({perfil.avaliacao_media+".0"} - {perfil.num_avaliacoes} {perfil.num_avaliacoes === 1 ? 'avaliação' : 'avaliações'})</p>
                             </div>
                         </div>
                     </div>
@@ -192,7 +192,7 @@ function PerfilDesenvolvedor() {
                                 <p className="mt-2 text-gray-700"><strong>Setor:</strong> {sistema.nome}</p>
                                 <p className="mt-2 text-gray-700"><strong>Setor:</strong> {sistema.setor}</p>
                                 <p className="mt-2 text-gray-700"><strong>Descrição:</strong> {sistema.descricao}</p>
-                                <p className="mt-2 text-gray-700"><strong>Status:</strong> {sistema.status == 'concluido' ? 'Concluído' : 'Em Andamento'}</p>
+                                <p className="mt-2 text-gray-700"><strong>Status:</strong> {sistema.status === 'concluido' ? 'Concluído' : 'Em Andamento'}</p>
                             </div>
                         </SwiperSlide>
                     ))}

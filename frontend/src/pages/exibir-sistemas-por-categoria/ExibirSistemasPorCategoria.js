@@ -3,6 +3,11 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
 
+const API_BASE_URL =
+  window.location.hostname === "localhost"
+    ? "http://localhost:8000/sisteminha_api"
+    : "http://34.198.150.133:8000/sisteminha_api";
+
 function ExibirSistemasPorCategoria(){
     const { state } = useLocation();
     const nome = state?.nome;
@@ -12,7 +17,7 @@ function ExibirSistemasPorCategoria(){
     React.useEffect(() => {
         async function fetchSistemas(){
             try {
-                const response = await axios.get(`http://localhost:8000/sisteminha_api/sistemas/${id}/sistemas_por_categoria/`);
+                const response = await axios.get(`${API_BASE_URL}/sistemas/${id}/sistemas_por_categoria/`);
                 setSistemas(response.data);
 
             } catch(err){
@@ -37,14 +42,13 @@ function ExibirSistemasPorCategoria(){
                         className="bg-[#f4e9ff] p-5 flex items-center rounded-3xl w-3/4 max-lg:w-full mx-auto mb-5 max-md:block"
                     >
                         <img
-                            src={`http://localhost:8000${sistema.imagem}`} alt={`sistema-${sistema.id}`}
-                            className="w-64 max-md:w-full"
+                                src={`http://localhost:8000${sistema.imagem}`} alt={`sistema-${sistema.id}`}                            className="w-64 max-md:w-full"
                         />
                         <div
                             className="w-2/3 p-2 max-md:w-full"
                         >
                             <h2
-                                className="font-sans text-[30px] text-regular border-b-[3px] border-[#7c5c9d] text-center inline-block"// max-w-[250px]"
+                                className="font-sans text-[30px] text-regular border-b-[3px] border-[#7c5c9d] text-center inline-block"
                             >{sistema.nome}</h2>
                             <p
                                 className="font-sans font-regular text-[20px] my-3"

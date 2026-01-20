@@ -98,7 +98,9 @@ class SistemaViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["get"])
     def avaliacoes_sistema(self, request, pk):
         sistema_id = pk
-        avaliacoes = Avaliacao_Sistema.objects.filter(desenvolvedor=sistema_id)
+        # Corrige filtro: buscar avaliações do sistema (campo 'sistema'),
+        # não do desenvolvedor.
+        avaliacoes = Avaliacao_Sistema.objects.filter(sistema=sistema_id)
         serializer = Avaliacao_SistemaSerializer(avaliacoes, many=True)
         return Response(serializer.data)
 
@@ -142,46 +144,39 @@ class DesenvolvedorRegistrationView(APIView):
 class DesenvolvedorLoginView(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
         email = request.data.get("email")
-        user_request = User.objects.get(email=email)
+        # Use filter().first() para evitar exceção se não existir
+        user_request = User.objects.filter(email=email).first()
+        if user_request is None:
+            return Response({"message": "Usuário ou Senha Inválido"}, status=status.HTTP_401_UNAUTHORIZED)
 
-        if user_request is not None:
-            username = user_request.username
-            password = request.data.get("password")
+        username = user_request.username
+        password = request.data.get("password")
 
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                login(request, user)
-                token, created = Token.objects.get_or_create(user=user)
-                if created:
-                    token.delete()  # Deleta o token antigo
-                    token = Token.objects.create(user=user)
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            token, created = Token.objects.get_or_create(user=user)
+            if created:
+                token.delete()  # Deleta o token antigo
+                token = Token.objects.create(user=user)
 
-                response_data = {
-                    "token": token.key,
-                    "username": user.username,
-                    "perfil": user.perfil,
-                }
+            response_data = {
+                "token": token.key,
+                "username": user.username,
+                "perfil": user.perfil,
+            }
 
-                if user.perfil == "desenvolvedor":
-                    desenvolvedor = (
-                        user.desenvolvedor
-                    )  # Assumindo que a relação tem nome "desenvolvedor"
-                    if desenvolvedor is not None:
-                        # Adiciona os dados do desenvolvedor ao response_data
-                        desenvolvedor_data = DesenvolvedorSerializer(desenvolvedor).data
-                        response_data["data"] = desenvolvedor_data
+            if user.perfil == "desenvolvedor":
+                try:
+                    desenvolvedor = user.desenvolvedor
+                    desenvolvedor_data = DesenvolvedorSerializer(desenvolvedor).data
+                    response_data["data"] = desenvolvedor_data
+                except Exception:
+                    pass
 
-                return Response(response_data)
-            else:
-                return Response(
-                    {"message": "Usuário ou Senha Inválido"},
-                    status=status.HTTP_401_UNAUTHORIZED,
-                )
-        else:
-            return Response(
-                {"message": "Usuário ou Senha Inválido"},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
+            return Response(response_data)
+
+        return Response({"message": "Usuário ou Senha Inválido"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class MicroempreendedorRegistrationView(APIView):
@@ -219,45 +214,38 @@ class MicroempreendedorRegistrationView(APIView):
 class MicroempreendedorLoginView(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
         email = request.data.get("email")
-        user_request = User.objects.get(email=email)
+        user_request = User.objects.filter(email=email).first()
+        if user_request is None:
+            return Response({"message": "Usuário ou Senha Inválido"}, status=status.HTTP_401_UNAUTHORIZED)
 
-        if user_request is not None:
-            username = user_request.username
-            password = request.data.get("password")
+        username = user_request.username
+        password = request.data.get("password")
 
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                login(request, user)
-                token, created = Token.objects.get_or_create(user=user)
-                if created:
-                    token.delete()
-                    token = Token.objects.create(user=user)
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            token, created = Token.objects.get_or_create(user=user)
+            if created:
+                token.delete()
+                token = Token.objects.create(user=user)
 
-                response_data = {
-                    "token": token.key,
-                    "username": user.username,
-                    "perfil": user.perfil,
-                }
+            response_data = {
+                "token": token.key,
+                "username": user.username,
+                "perfil": user.perfil,
+            }
 
-                if user.perfil == "microempreendedor":
+            if user.perfil == "microempreendedor":
+                try:
                     microempreendedor = user.microempreendedor
-                    if microempreendedor is not None:
-                        microempreendedor_data = MicroempreendedorSerializer(
-                            microempreendedor
-                        ).data
-                        response_data["data"] = microempreendedor_data
+                    microempreendedor_data = MicroempreendedorSerializer(microempreendedor).data
+                    response_data["data"] = microempreendedor_data
+                except Exception:
+                    pass
 
-                return Response(response_data)
-            else:
-                return Response(
-                    {"message": "Usuário ou Senha Inválido"},
-                    status=status.HTTP_401_UNAUTHORIZED,
-                )
-        else:
-            return Response(
-                {"message": "Usuário ou Senha Inválido"},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
+            return Response(response_data)
+
+        return Response({"message": "Usuário ou Senha Inválido"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class RegistroUsuarioView(APIView):
@@ -299,9 +287,21 @@ class LogoutUsuarioView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        print(request.headers)
-        token_key = request.auth.key
-        token = Token.objects.get(key=token_key)
-        token.delete()
+        # Suporta autenticação por Token ou header Authorization
+        token_obj = None
+        # request.auth pode ser um Token instance (TokenAuthentication)
+        if getattr(request, 'auth', None):
+            token_obj = request.auth
+        else:
+            auth_header = request.headers.get('Authorization', '')
+            if auth_header.startswith('Token '):
+                key = auth_header.split()[1]
+                token_obj = Token.objects.filter(key=key).first()
+
+        if token_obj:
+            try:
+                token_obj.delete()
+            except Exception:
+                pass
 
         return Response({'detail': 'Usuário deslogado com sucesso.'})
